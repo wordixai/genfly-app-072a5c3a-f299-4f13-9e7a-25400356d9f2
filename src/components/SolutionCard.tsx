@@ -33,7 +33,7 @@ export const SolutionCard = ({
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between">
           <CardTitle className="text-xl font-bold text-foreground">{title}</CardTitle>
-          <Badge variant="outline" className={`${difficulPatch: Add difficulty colors[difficulty]} text-white border-none capitalize`}>
+          <Badge variant="outline" className={`${difficultyColors[difficulty]} text-white border-none capitalize`}>
             {difficulty}
           </Badge>
         </div>

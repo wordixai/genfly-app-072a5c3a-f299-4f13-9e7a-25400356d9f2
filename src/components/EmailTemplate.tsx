@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Copy, Mail, MessageSquare, Star } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface EmailTemplateProps {
   industry: string;
@@ -13,11 +14,42 @@ interface EmailTemplateProps {
 
 export const EmailTemplate = ({ industry, subject, template, personalizedTips }: EmailTemplateProps) => {
   const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyToClipboard = async (text: string) => {
+    try {
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      
+      setCopied(true);
+      toast({
+        title: "Copied to clipboard!",
+        description: "The content has been copied to your clipboard.",
+      });
+      
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      toast({
+        title: "Copy failed",
+        description: "Please try selecting and copying the text manually.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
